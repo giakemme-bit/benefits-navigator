@@ -59,6 +59,15 @@ await goHash('#/help?topic=sanatorno_kurortnoe_lechenie');
 await heading('Мы поможем');
 await flow.snapshot({ name: 'help' });
 
+await goHash('#/');
+await heading('Узнайте');
+await clickText('button', 'Қазақша');
+await heading('Сізге қандай');
+await flow.snapshot({ name: 'year-kk' });
+await goHash('#/benefits');
+await heading('Сізге тиесілі');
+await flow.snapshot({ name: 'benefits-kk' });
+
 const result = await flow.createFlowResult();
 let min = 100;
 for (const step of result.steps) {

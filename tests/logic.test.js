@@ -77,6 +77,8 @@ test('i18n: kk has the same keys as ru', () => {
   const kk = JSON.parse(fs.readFileSync(new URL('../public/i18n/kk.json', import.meta.url)));
   const strip = (o) => Object.keys(o).filter((k) => !k.startsWith('_')).sort();
   assert.deepEqual(strip(kk), strip(ru));
+  const empty = strip(kk).filter((k) => !String(kk[k]).trim());
+  assert.deepEqual(empty, [], 'kk.json: empty strings');
 });
 
 test('contact links', () => {

@@ -70,5 +70,6 @@
   "titles.guide": "Инструкция",
   "titles.help": "Нужна помощь",
   "guide.more": "Подробно",
-  "guide.terms": "Что означают сокращения"
+  "guide.terms": "Что означают сокращения",
+  "common.dataLanguageNotice": "Информация о льготах пока только на русском."
 }

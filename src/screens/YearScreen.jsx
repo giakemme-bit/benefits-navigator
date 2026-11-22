@@ -3,7 +3,7 @@ import { useT } from '../lib/i18n.jsx';
 import { href, navigate } from '../lib/router.js';
 import { ageFromYear, groupOptions, segmentForAge, validateYear } from '../lib/logic.js';
 
-export default function YearScreen({ data, setProfile }) {
+export default function YearScreen({ data, setProfile, langChoice }) {
   const { t } = useT();
   const [value, setValue] = useState('');
   const [error, setError] = useState('');
@@ -35,6 +35,7 @@ export default function YearScreen({ data, setProfile }) {
 
   return (
     <>
+      {langChoice}
       <h1 tabIndex={-1}>{t('year.title')}</h1>
       <p className="lead">{t('year.lead')}</p>
       <form className="stack" onSubmit={submit} noValidate>

@@ -17,10 +17,16 @@ export default function BenefitsScreen({ data, profile, received, setReceived, r
   useEffect(() => { if (!ready) navigate('year'); }, [ready]);
   if (!ready) return null;
 
-  // Benefits with a step-by-step guide go first (the pilot scenario), the rest keep table order.
+  // Benefits with a step-by-step guide go first, in the order guides are listed in guides.json
+  // (the sanatorium pilot is first there); the rest keep table order.
+  const guideOrder = Object.keys(data.guides).filter((k) => typeof data.guides[k] === 'object');
+  const rank = (b) => {
+    const i = guideOrder.indexOf(guideKeyFor(b, data.guides));
+    return i === -1 ? guideOrder.length : i;
+  };
   const list = filterBenefits(data.benefits, profile, data.config.hiddenStatuses)
-    .map((b, i) => ({ b, i, guided: guideKeyFor(b, data.guides) ? 0 : 1 }))
-    .sort((x, y) => x.guided - y.guided || x.i - y.i)
+    .map((b, i) => ({ b, i, r: rank(b) }))
+    .sort((x, y) => x.r - y.r || x.i - y.i)
     .map((x) => x.b);
   const done = list.filter((b) => received[b.id]).length;
   const backTo = profile.options?.length ? href('group') : href('year');
@@ -30,6 +36,7 @@ export default function BenefitsScreen({ data, profile, received, setReceived, r
       <BackLink to={backTo} />
       <h1 tabIndex={-1}>{t('benefits.title')}</h1>
       <p className="chip">{profileLabel(t, profile)}</p>
+      {data.russianOnly && <p className="lang-notice" role="note">{t('common.dataLanguageNotice')}</p>}
       <p className="notice" role="note">{t('common.draftNotice')}</p>
 
       {list.length === 0 ? (

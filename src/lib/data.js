@@ -25,3 +25,14 @@ export async function loadDict(lang) {
     return {};
   }
 }
+
+// Optional translations of the content: data/benefits.kk.json etc. Missing files fall back to Russian.
+export async function loadLocalized(lang) {
+  const get = (name) => getJson(`data/${name}.${lang}.json`).catch(() => null);
+  const [benefits, guides, glossary] = await Promise.all([get('benefits'), get('guides'), get('glossary')]);
+  return {
+    benefits: benefits?.benefits || null,
+    guides: guides || null,
+    glossary: glossary?.terms || null,
+  };
+}

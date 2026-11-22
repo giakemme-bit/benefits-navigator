@@ -2,9 +2,14 @@
   "_comment": "Настройки сайта. Меняйте значения справа от двоеточия. После сохранения обновите страницу.",
   "defaultLanguage": "ru",
   "languages": [
+    "ru",
+    "kk"
+  ],
+  "_languagesComment": "Языки интерфейса. Тексты кнопок и экранов: public/i18n/<язык>.json.",
+  "contentLanguages": [
     "ru"
   ],
-  "_languagesComment": "Когда kk.json будет заполнен, добавьте \"kk\" в список: [\"ru\", \"kk\"]. Появится переключатель языка.",
+  "_contentLanguagesComment": "Языки, на которые переведены льготы и инструкции. Чтобы добавить казахский: положите в public/data файлы benefits.kk.json, guides.kk.json, glossary.kk.json (формат как у русских) и допишите \"kk\" сюда. Пока его нет, на казахском показывается русский текст с пометкой.",
   "childMaxAge": 17,
   "under7MaxAge": 6,
   "pensionAge": 63,

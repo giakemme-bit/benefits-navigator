@@ -37,6 +37,7 @@ export default function GuideScreen({ data, route }) {
     <>
       <BackLink to={href('benefits')} />
       <h1 tabIndex={-1}>{guide?.title || t('guide.genericTitle', { title: benefit.title })}</h1>
+      {data.russianOnly && <p className="lang-notice" role="note">{t('common.dataLanguageNotice')}</p>}
       {guide?.tags?.length > 0 && (
         <ul className="tags">{guide.tags.map((tag) => <li key={tag} className="chip">{tag}</li>)}</ul>
       )}

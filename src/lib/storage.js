@@ -1,10 +1,13 @@
-// Answers are kept in memory only. This removes what earlier versions saved on the device.
-const KEY = 'benefits-navigator:v1';
+// Answers and language are kept in memory only.
+// This removes what earlier versions of the site saved on the device.
+const KEYS = ['benefits-navigator:v1', 'benefits-navigator:lang'];
 
 export function clearState() {
-  try {
-    window.localStorage.removeItem(KEY);
-  } catch {
-    // Storage disabled: nothing to remove.
+  for (const key of KEYS) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      // Storage disabled: nothing to remove.
+    }
   }
 }

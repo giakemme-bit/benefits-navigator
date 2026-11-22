@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { loadAll, loadDict } from './lib/data.js';
+import { loadAll, loadDict, loadLocalized } from './lib/data.js';
 import { I18nContext, makeT } from './lib/i18n.jsx';
 import { useRoute, navigate } from './lib/router.js';
 import { clearState } from './lib/storage.js';
@@ -8,10 +8,15 @@ import GroupScreen from './screens/GroupScreen.jsx';
 import BenefitsScreen from './screens/BenefitsScreen.jsx';
 import GuideScreen from './screens/GuideScreen.jsx';
 import HelpScreen from './screens/HelpScreen.jsx';
+import LangChoice from './screens/LangChoice.jsx';
 
-const LANG_KEY = 'benefits-navigator:lang';
-function storedLang() {
-  try { return window.localStorage.getItem(LANG_KEY); } catch { return null; }
+// Language is not saved either: it starts from the browser's language, Russian otherwise.
+function browserLang() {
+  try {
+    return (navigator.languages || [navigator.language]).some((l) => /^kk\b/i.test(l)) ? 'kk' : 'ru';
+  } catch {
+    return 'ru';
+  }
 }
 
 export default function App() {
@@ -19,7 +24,8 @@ export default function App() {
   const [data, setData] = useState(null);
   const [failed, setFailed] = useState(false);
   const [dicts, setDicts] = useState({ ru: null });
-  const [lang, setLang] = useState(storedLang() || 'ru');
+  const [lang, setLang] = useState(browserLang);
+  const [localized, setLocalized] = useState({});
   // Answers live in memory only: refreshing the page starts over.
   // profile: { segment, options, group, childhood } — no birth year, no names.
   const [profile, setProfile] = useState(null);
@@ -40,6 +46,13 @@ export default function App() {
     document.documentElement.lang = activeLang;
   }, [activeLang, dicts]);
 
+  // Benefits, guides and glossary in the chosen language, if the author has added them.
+  useEffect(() => {
+    const hasContent = (data?.config.contentLanguages || ['ru']).includes(activeLang);
+    if (activeLang === 'ru' || !hasContent || localized[activeLang]) return;
+    loadLocalized(activeLang).then((d) => setLocalized((all) => ({ ...all, [activeLang]: d })));
+  }, [activeLang, localized, data]);
+
   // Remove answers saved on this device by earlier versions of the site.
   useEffect(() => { clearState(); }, []);
 
@@ -49,18 +62,21 @@ export default function App() {
   // Move focus to the new screen's heading so screen readers announce it.
   const mainRef = useRef(null);
   const firstRender = useRef(true);
+  const ready = !!(data && dicts.ru);
   useEffect(() => {
-    if (!data || !dicts.ru) return;
+    if (!ready) return;
     const titleKey = { year: 'titles.year', group: 'titles.group', benefits: 'titles.benefits', guide: 'titles.guide', help: 'titles.help' }[route.name];
     document.title = `${titleKey ? t(titleKey) : ''} · ${t('app.name')}`;
+  }, [ready, route.name, t]);
+  useEffect(() => {
+    if (!ready) return;
     if (firstRender.current) { firstRender.current = false; return; }
     window.scrollTo(0, 0);
     mainRef.current?.querySelector('h1')?.focus();
-  }, [route.name, route.param, data, dicts.ru, t]);
+  }, [ready, route.name, route.param]);
 
   function changeLang(next) {
     setLang(next);
-    try { window.localStorage.setItem(LANG_KEY, next); } catch { /* ignore */ }
   }
 
   function reset() {
@@ -83,7 +99,19 @@ export default function App() {
     return <main className="page" id="main"><p aria-live="polite">Загрузка…</p></main>;
   }
 
-  const ctx = { data, profile, setProfile, received, setReceived, reset, route };
+  const loc = activeLang === 'ru' ? {} : localized[activeLang] || {};
+  const shown = {
+    ...data,
+    benefits: loc.benefits || data.benefits,
+    guides: loc.guides || data.guides,
+    glossary: loc.glossary || data.glossary,
+    // true when the chosen language has no translated benefits yet
+    russianOnly: activeLang !== 'ru' && !loc.benefits,
+  };
+  const langChoice = languages.length > 1
+    ? <LangChoice languages={languages} active={activeLang} onChange={changeLang} />
+    : null;
+  const ctx = { data: shown, profile, setProfile, received, setReceived, reset, route, langChoice };
   let screen;
   switch (route.name) {
     case 'group': screen = <GroupScreen {...ctx} />; break;
@@ -100,14 +128,8 @@ export default function App() {
       </a>
       <header className="topbar">
         <span className="brand">{t('app.name')}</span>
-        {languages.length > 1 && (
-          <div className="lang" role="group" aria-label={t('common.language')}>
-            {languages.map((l) => (
-              <button key={l} type="button" className="lang-btn" aria-pressed={l === activeLang} onClick={() => changeLang(l)} lang={l}>
-                {l === 'kk' ? 'Қаз' : l === 'ru' ? 'Рус' : l}
-              </button>
-            ))}
-          </div>
+        {languages.length > 1 && route.name !== 'year' && (
+          <LangChoice languages={languages} active={activeLang} onChange={changeLang} compact />
         )}
       </header>
       <main className="page" id="main" ref={mainRef}>{screen}</main>

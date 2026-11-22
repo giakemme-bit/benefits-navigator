@@ -73,6 +73,25 @@ await page.reload();
 await page.getByRole('heading', { level: 1 }).waitFor();
 assert.equal(await page.evaluate(() => localStorage.getItem('benefits-navigator:v1')), null);
 
+// Language choice on the first screen.
+await page.goto(URL);
+await page.reload();
+await page.getByRole('button', { name: 'Қазақша' }).tap();
+await page.getByRole('heading', { name: 'Сізге қандай көмек тиесілі екенін біліңіз' }).waitFor();
+assert.equal(await page.evaluate(() => document.documentElement.lang), 'kk');
+await page.getByLabel('Мүгедектігі бар адамның туған жылы').fill('1985');
+await page.getByRole('button', { name: 'Жалғастыру' }).tap();
+await page.getByRole('radio', { name: 'II топ', exact: true }).check();
+await page.getByRole('button', { name: 'Жоқ', exact: true }).tap();
+await page.getByRole('heading', { name: 'Сізге тиесілі' }).waitFor();
+assert.ok(await page.getByText('Жеңілдіктер мен нұсқаулықтар әзірге орыс тілінде.').isVisible());
+await page.getByRole('button', { name: 'Русский' }).tap();
+await page.getByRole('heading', { name: 'Вам положено' }).waitFor();
+assert.equal(await page.getByText('Информация о льготах пока только на русском.').count(), 0);
+assert.equal(await page.evaluate(() => localStorage.length), 0, 'language not stored');
+await page.reload();
+await page.getByRole('heading', { name: 'Узнайте, какая помощь вам положена' }).waitFor();
+
 // Path 2: child under 7 → no group question at all.
 const y = new Date().getFullYear() - 3;
 await page.getByLabel('Год рождения человека с инвалидностью').fill(String(y));
