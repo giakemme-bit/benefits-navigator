@@ -67,6 +67,9 @@ await flow.snapshot({ name: 'year-kk' });
 await goHash('#/benefits');
 await heading('Сізге тиесілі');
 await flow.snapshot({ name: 'benefits-kk' });
+await goHash('#/guide/sanatorno_kurortnoe_lechenie');
+await heading('Санаторий-курорттық');
+await flow.snapshot({ name: 'guide-kk' });
 
 const result = await flow.createFlowResult();
 let min = 100;

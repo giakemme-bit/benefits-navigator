@@ -3,6 +3,7 @@ import { loadAll, loadDict, loadLocalized } from './lib/data.js';
 import { I18nContext, makeT } from './lib/i18n.jsx';
 import { useRoute, navigate } from './lib/router.js';
 import { clearState } from './lib/storage.js';
+import { localizeContent } from './lib/logic.js';
 import YearScreen from './screens/YearScreen.jsx';
 import GroupScreen from './screens/GroupScreen.jsx';
 import BenefitsScreen from './screens/BenefitsScreen.jsx';
@@ -99,15 +100,9 @@ export default function App() {
     return <main className="page" id="main"><p aria-live="polite">Загрузка…</p></main>;
   }
 
-  const loc = activeLang === 'ru' ? {} : localized[activeLang] || {};
-  const shown = {
-    ...data,
-    benefits: loc.benefits || data.benefits,
-    guides: loc.guides || data.guides,
-    glossary: loc.glossary || data.glossary,
-    // true when the chosen language has no translated benefits yet
-    russianOnly: activeLang !== 'ru' && !loc.benefits,
-  };
+  const localizedData = activeLang === 'ru' ? data : localizeContent(data, localized[activeLang]);
+  // russianOnly: the chosen language has no translated benefits yet, so a note is shown.
+  const shown = { ...localizedData, russianOnly: activeLang !== 'ru' && !localizedData.translated };
   const langChoice = languages.length > 1
     ? <LangChoice languages={languages} active={activeLang} onChange={changeLang} />
     : null;

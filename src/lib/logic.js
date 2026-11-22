@@ -92,3 +92,20 @@ export function termsIn(texts, glossary = {}) {
     return new RegExp(`(^|[^\\p{L}\\p{N}])${esc}($|[^\\p{L}\\p{N}])`, 'u').test(text);
   });
 }
+
+// Content in another language: text fields come from the translation (matched by id),
+// tags and statuses stay from the Russian table. Missing translations fall back to Russian.
+const TEXT_FIELDS = ['title', 'amount', 'howTo', 'basis'];
+export function localizeContent(base, loc) {
+  if (!loc) return { ...base, translated: false };
+  const byId = Object.fromEntries((loc.benefits || []).map((b) => [b.id, b]));
+  const benefits = base.benefits.map((b) => {
+    const tr = byId[b.id] || {};
+    const out = { ...b, guideId: guideKeyFor(b, base.guides) };
+    for (const f of TEXT_FIELDS) if (tr[f]) out[f] = tr[f];
+    return out;
+  });
+  const guides = { ...base.guides };
+  for (const [k, g] of Object.entries(loc.guides || {})) if (g && typeof g === 'object' && guides[k]) guides[k] = { ...guides[k], ...g };
+  return { ...base, benefits, guides, glossary: loc.glossary || base.glossary, translated: true };
+}

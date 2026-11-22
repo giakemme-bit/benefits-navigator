@@ -31,8 +31,8 @@ export async function loadLocalized(lang) {
   const get = (name) => getJson(`data/${name}.${lang}.json`).catch(() => null);
   const [benefits, guides, glossary] = await Promise.all([get('benefits'), get('guides'), get('glossary')]);
   return {
-    benefits: benefits?.benefits || null,
-    guides: guides || null,
+    benefits: benefits?.benefits || [],
+    guides: guides || {},
     glossary: glossary?.terms || null,
   };
 }

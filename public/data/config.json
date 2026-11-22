@@ -7,9 +7,10 @@
   ],
   "_languagesComment": "Языки интерфейса. Тексты кнопок и экранов: public/i18n/<язык>.json.",
   "contentLanguages": [
-    "ru"
+    "ru",
+    "kk"
   ],
-  "_contentLanguagesComment": "Языки, на которые переведены льготы и инструкции. Чтобы добавить казахский: положите в public/data файлы benefits.kk.json, guides.kk.json, glossary.kk.json (формат как у русских) и допишите \"kk\" сюда. Пока его нет, на казахском показывается русский текст с пометкой.",
+  "_contentLanguagesComment": "Языки, на которые переведены льготы и инструкции. Казахский: benefits.kk.json, guides.kk.json, glossary.kk.json (ЧЕРНОВИК перевода). Перевод льготы ищется по id; если его нет, показывается русский текст.",
   "childMaxAge": 17,
   "under7MaxAge": 6,
   "pensionAge": 63,

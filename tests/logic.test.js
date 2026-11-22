@@ -110,3 +110,28 @@ test('glossary: whole words only', async () => {
   assert.deepEqual(termsIn('ГСП по инвалидности', g).map(([k]) => k), ['ГСП']);
   assert.deepEqual(termsIn(['Подать в ЦОН.', 'ИПНА'], g).map(([k]) => k), ['ЦОН']);
 });
+
+test('kk content: every visible benefit and every guide is translated, structure matches', async () => {
+  const { localizeContent } = await import('../src/lib/logic.js');
+  const read = (n) => JSON.parse(fs.readFileSync(new URL(`../public/data/${n}`, import.meta.url)));
+  const ruGuides = read('guides.json');
+  const kkB = read('benefits.kk.json').benefits;
+  const kkG = read('guides.kk.json');
+  const hidden = new Set(config.hiddenStatuses);
+  const kkIds = new Set(kkB.map((b) => b.id));
+  const ruIds = new Set(benefits.map((b) => b.id));
+  for (const b of benefits) if (!hidden.has(b.status)) assert.ok(kkIds.has(b.id), `нет перевода: ${b.id}`);
+  for (const id of kkIds) assert.ok(ruIds.has(id), `лишний перевод (нет в таблице): ${id}`);
+  for (const [k, g] of Object.entries(ruGuides)) {
+    if (typeof g !== 'object') continue;
+    assert.ok(kkG[k], `нет перевода инструкции ${k}`);
+    assert.equal(kkG[k].steps.length, g.steps.length, `${k}: число шагов`);
+    g.steps.forEach((s, i) => assert.equal(!!kkG[k].steps[i].details, !!s.details, `${k} шаг ${i + 1}: details`));
+  }
+  // guides stay linked after titles are translated
+  const shown = localizeContent({ benefits, guides: ruGuides, glossary: {} }, { benefits: kkB, guides: kkG, glossary: {} });
+  const san = shown.benefits.find((b) => b.id === 'sanatorno_kurortnoe_lechenie');
+  assert.equal(san.title, 'Санаторий-курорттық емдеу');
+  assert.equal(san.guideId, 'sanatorium');
+  assert.ok(shown.benefits.filter((b) => b.title.startsWith('МӘЖ')).every((b) => b.guideId));
+});
