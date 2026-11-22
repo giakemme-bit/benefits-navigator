@@ -16,7 +16,11 @@ export default function BenefitsScreen({ data, profile, received, setReceived, r
   useEffect(() => { if (!ready) navigate('year'); }, [ready]);
   if (!ready) return null;
 
-  const list = filterBenefits(data.benefits, profile);
+  // Benefits with a step-by-step guide go first (the pilot scenario), the rest keep table order.
+  const list = filterBenefits(data.benefits, profile, data.config.hiddenStatuses)
+    .map((b, i) => ({ b, i, guided: b.guideId && data.guides[b.guideId] ? 0 : 1 }))
+    .sort((x, y) => x.guided - y.guided || x.i - y.i)
+    .map((x) => x.b);
   const done = list.filter((b) => received[b.id]).length;
   const backTo = profile.options?.length ? href('group') : href('year');
 

@@ -37,9 +37,11 @@ export function asksChildhood(segment) {
   return segment !== 'child';
 }
 
-export function filterBenefits(benefits, { segment, group, childhood }) {
+export function filterBenefits(benefits, { segment, group, childhood }, hiddenStatuses = []) {
   const fromChildhood = segment === 'child' ? true : childhood;
+  const hidden = new Set(hiddenStatuses.map((s) => s.trim().toLowerCase()));
   return benefits.filter((b) => {
+    if (hidden.has(String(b.status || '').trim().toLowerCase())) return false;
     if (!b.segments?.includes(segment)) return false;
     if (!b.groups?.includes(group)) return false;
     if (b.childhood === true && fromChildhood !== true) return false;

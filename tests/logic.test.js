@@ -33,20 +33,29 @@ test('group options: under 7 skips the group question', () => {
   assert.equal(asksChildhood('adult'), true);
 });
 
-test('filterBenefits respects segment, group and childhood', () => {
-  const ids = (p) => filterBenefits(benefits, p).map((b) => b.id);
-  const adultNo = ids({ segment: 'adult', group: 'II', childhood: false });
-  assert.ok(adultNo.includes('sanatorium'));
-  assert.ok(adultNo.includes('gsp_disability'));
-  assert.ok(!adultNo.includes('gsp_childhood'));
-  assert.ok(!adultNo.includes('gsp_child'));
-  const adultYes = ids({ segment: 'adult', group: 'II', childhood: true });
-  assert.ok(adultYes.includes('gsp_childhood'));
-  assert.ok(!adultYes.includes('gsp_disability'));
-  const baby = ids({ segment: 'child', group: 'under7', childhood: null });
-  assert.ok(baby.includes('gsp_child'));
-  assert.ok(baby.includes('sanatorium'));
-  assert.ok(!baby.includes('carer_group1'));
+test('filterBenefits respects segment, group, childhood and hidden statuses', () => {
+  const titles = (p) => filterBenefits(benefits, p, config.hiddenStatuses).map((b) => b.title);
+  const has = (list, part) => list.some((t) => t.includes(part));
+  const adultNo = titles({ segment: 'adult', group: 'II', childhood: false });
+  assert.ok(has(adultNo, 'Санаторно-курортное лечение'));
+  assert.ok(has(adultNo, 'от общего заболевания'));
+  assert.ok(!has(adultNo, 'с детства'));
+  assert.ok(!has(adultNo, 'ребёнок'));
+  const adultYes = titles({ segment: 'adult', group: 'II', childhood: true });
+  assert.ok(has(adultYes, 'с детства'));
+  assert.ok(!has(adultYes, 'от общего заболевания'));
+  const baby = titles({ segment: 'child', group: 'under7', childhood: null });
+  assert.ok(has(baby, 'ребёнок до 7 лет'));
+  assert.ok(has(baby, 'Санаторно-курортное лечение'));
+  assert.ok(!has(baby, 'ребёнок 7-18'));
+  // one ГСП row per group, never two
+  for (const g of ['I', 'II', 'III']) {
+    assert.equal(titles({ segment: 'adult', group: g, childhood: false }).filter((t) => t.startsWith('ГСП')).length, 1);
+  }
+  // «Нужно собрать» is never shown
+  const statuses = new Set(['child', 'adult', 'pensioner'].flatMap((segment) =>
+    filterBenefits(benefits, { segment, group: 'I', childhood: false }, config.hiddenStatuses).map((b) => b.status)));
+  assert.ok(!statuses.has('Нужно собрать'));
 });
 
 test('every benefit has the required fields and valid tags', () => {

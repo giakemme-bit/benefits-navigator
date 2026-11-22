@@ -12,7 +12,7 @@ await page.evaluate(() => localStorage.setItem('benefits-navigator:v1', JSON.str
   profile: { segment: 'adult', options: ['I', 'II', 'III'], group: 'II', childhood: false }, received: { tsr: true },
 })));
 
-const routes = ['', '#/group', '#/benefits', '#/guide/sanatorium', '#/guide/medicines', '#/help?topic=sanatorium'];
+const routes = ['', '#/group', '#/benefits', '#/guide/sanatorno_kurortnoe_lechenie', '#/guide/individualnyy_pomoshnik', '#/help?topic=sanatorno_kurortnoe_lechenie'];
 let min = 100;
 for (const r of routes) {
   const res = await lighthouse(BASE + r, {

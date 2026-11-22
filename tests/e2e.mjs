@@ -34,8 +34,8 @@ await tap(page.getByRole('button', { name: 'Нет', exact: true }));
 await page.getByRole('heading', { name: 'Вам положено' }).waitFor();
 await noHScroll('3-benefits');
 const titles = await page.locator('.card-title').allTextContents();
-assert.ok(titles.includes('Пособие по инвалидности'));
-assert.ok(!titles.includes('Пособие по инвалидности с детства'));
+assert.ok(titles.some((t) => t.includes('от общего заболевания')));
+assert.ok(!titles.some((t) => t.includes('с детства')));
 assert.ok(await page.getByText('Суммы и порядок сверяются с официальными источниками').isVisible());
 await tap(page.getByRole('link', { name: /Как получить: Санаторно-курортное лечение/ }));
 await page.getByRole('heading', { name: 'Как получить санаторно-курортное лечение' }).waitFor();
@@ -56,11 +56,12 @@ await noHScroll('5-help');
 
 // Mark as received → "Как получить" disappears, survives reload (localStorage).
 await page.goto(URL + '#/benefits');
-await page.getByRole('checkbox', { name: /Получаю/ }).first().check();
+await page.locator('li', { hasText: 'Санаторно-курортное лечение' }).getByRole('checkbox').check();
 await page.reload();
 await page.getByRole('heading', { name: 'Вам положено' }).waitFor();
-assert.ok(await page.getByRole('checkbox').first().isChecked());
+assert.ok(await page.locator('li', { hasText: 'Санаторно-курортное лечение' }).getByRole('checkbox').isChecked());
 assert.equal(await page.getByRole('link', { name: /Как получить: Санаторно/ }).count(), 0);
+
 await page.getByRole('button', { name: /Начать заново/ }).tap();
 await page.getByRole('heading', { name: 'Узнайте, какая помощь вам положена' }).waitFor();
 const saved = JSON.parse(await page.evaluate(() => localStorage.getItem('benefits-navigator:v1')) || '{}');
