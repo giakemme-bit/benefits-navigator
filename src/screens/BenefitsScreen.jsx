@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import { useT } from '../lib/i18n.jsx';
 import { href, navigate } from '../lib/router.js';
-import { asksChildhood, filterBenefits, isVerified } from '../lib/logic.js';
+import { asksChildhood, filterBenefits, guideKeyFor, isVerified } from '../lib/logic.js';
+import Terms from './Terms.jsx';
 import BackLink from './BackLink.jsx';
 
 export function profileLabel(t, profile) {
@@ -18,7 +19,7 @@ export default function BenefitsScreen({ data, profile, received, setReceived, r
 
   // Benefits with a step-by-step guide go first (the pilot scenario), the rest keep table order.
   const list = filterBenefits(data.benefits, profile, data.config.hiddenStatuses)
-    .map((b, i) => ({ b, i, guided: b.guideId && data.guides[b.guideId] ? 0 : 1 }))
+    .map((b, i) => ({ b, i, guided: guideKeyFor(b, data.guides) ? 0 : 1 }))
     .sort((x, y) => x.guided - y.guided || x.i - y.i)
     .map((x) => x.b);
   const done = list.filter((b) => received[b.id]).length;
@@ -44,6 +45,7 @@ export default function BenefitsScreen({ data, profile, received, setReceived, r
               return (
                 <li key={b.id} className={`card${isDone ? ' card-done' : ''}`}>
                   <h2 className="card-title" id={`title-${b.id}`}>{b.title}</h2>
+                  <Terms texts={b.title} glossary={data.glossary} />
                   {b.amount && <p className="card-text">{b.amount}</p>}
                   {!isVerified(b) && <p className="badge">{t('benefits.unverified')}</p>}
                   <div className="card-actions">

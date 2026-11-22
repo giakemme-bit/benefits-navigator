@@ -9,12 +9,13 @@ async function getJson(path) {
 }
 
 export async function loadAll() {
-  const [config, benefits, guides] = await Promise.all([
+  const [config, benefits, guides, glossary] = await Promise.all([
     getJson('data/config.json'),
     getJson('data/benefits.json'),
     getJson('data/guides.json'),
+    getJson('data/glossary.json').catch(() => ({})),
   ]);
-  return { config, benefits: benefits.benefits || [], guides };
+  return { config, benefits: benefits.benefits || [], guides, glossary: glossary.terms || {} };
 }
 
 export async function loadDict(lang) {

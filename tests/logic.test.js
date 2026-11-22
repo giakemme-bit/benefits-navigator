@@ -86,3 +86,25 @@ test('contact links', () => {
   assert.equal(telegramUrl('bad name'), '');
   assert.equal(interpolate('от {min} до {max}', { min: 1, max: 2 }), 'от 1 до 2');
 });
+
+test('guides are found by id or by benefit title, and every GSP row has one', async () => {
+  const { guideKeyFor } = await import('../src/lib/logic.js');
+  const guides = JSON.parse(fs.readFileSync(new URL('../public/data/guides.json', import.meta.url)));
+  for (const b of benefits.filter((x) => x.title.startsWith('ГСП'))) {
+    assert.ok(guideKeyFor(b, guides), `guide for ${b.title}`);
+  }
+  assert.equal(guideKeyFor(benefits.find((b) => b.title === 'Санаторно-курортное лечение'), guides), 'sanatorium');
+  // every benefitTitle in guides.json points to a real row of the table
+  const titles = new Set(benefits.map((b) => b.title));
+  for (const [key, g] of Object.entries(guides)) {
+    if (typeof g !== 'object') continue;
+    for (const t of [].concat(g.benefitTitle || [])) assert.ok(titles.has(t), `${key}: «${t}» нет в таблице`);
+  }
+});
+
+test('glossary: whole words only', async () => {
+  const { termsIn } = await import('../src/lib/logic.js');
+  const g = { 'ГСП': 'государственное социальное пособие', 'ИПН': 'налог', 'ЦОН': 'центр' };
+  assert.deepEqual(termsIn('ГСП по инвалидности', g).map(([k]) => k), ['ГСП']);
+  assert.deepEqual(termsIn(['Подать в ЦОН.', 'ИПНА'], g).map(([k]) => k), ['ЦОН']);
+});

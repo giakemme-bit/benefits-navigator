@@ -60,7 +60,7 @@ export function rowsToBenefits(rows, guides = {}) {
   const problems = [];
   const guideByTitle = {};
   for (const [key, g] of Object.entries(guides)) {
-    if (g && typeof g === 'object' && g.benefitTitle) guideByTitle[norm(g.benefitTitle)] = key;
+    if (g && typeof g === 'object') for (const t of [].concat(g.benefitTitle || [])) guideByTitle[norm(t)] = key;
   }
   const benefits = rows.map((r, i) => {
     const line = i + 2;

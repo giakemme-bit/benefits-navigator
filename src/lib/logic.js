@@ -69,3 +69,26 @@ export function telegramUrl(username) {
   if (!/^[A-Za-z0-9_]{4,32}$/.test(name)) return '';
   return `https://t.me/${name}`;
 }
+
+const normTitle = (s) => String(s ?? '').trim().toLowerCase().replace(/ё/g, 'е');
+
+// A benefit's guide: by guideId, or a guide whose benefitTitle (string or list) matches the title.
+export function guideKeyFor(benefit, guides = {}) {
+  if (benefit.guideId && guides[benefit.guideId]) return benefit.guideId;
+  const title = normTitle(benefit.title);
+  for (const [key, g] of Object.entries(guides)) {
+    if (!g || typeof g !== 'object') continue;
+    const titles = [].concat(g.benefitTitle || []);
+    if (titles.some((t) => normTitle(t) === title)) return key;
+  }
+  return '';
+}
+
+// Abbreviations from the glossary that occur in the texts, as whole words, in glossary order.
+export function termsIn(texts, glossary = {}) {
+  const text = [].concat(texts).filter(Boolean).join(' ');
+  return Object.entries(glossary).filter(([term]) => {
+    const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return new RegExp(`(^|[^\\p{L}\\p{N}])${esc}($|[^\\p{L}\\p{N}])`, 'u').test(text);
+  });
+}

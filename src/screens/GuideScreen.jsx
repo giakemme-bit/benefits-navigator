@@ -1,6 +1,8 @@
 import { useT } from '../lib/i18n.jsx';
 import { href } from '../lib/router.js';
 import BackLink from './BackLink.jsx';
+import Terms from './Terms.jsx';
+import { guideKeyFor, termsIn } from '../lib/logic.js';
 
 function ExternalLink({ url, label }) {
   const { t } = useT();
@@ -14,7 +16,7 @@ function ExternalLink({ url, label }) {
 export default function GuideScreen({ data, route }) {
   const { t } = useT();
   const benefit = data.benefits.find((b) => b.id === route.param);
-  const guide = benefit?.guideId ? data.guides[benefit.guideId] : null;
+  const guide = benefit ? data.guides[guideKeyFor(benefit, data.guides)] || null : null;
 
   if (!benefit) {
     return (
@@ -24,6 +26,12 @@ export default function GuideScreen({ data, route }) {
       </>
     );
   }
+
+  const pageTexts = [
+    benefit.title, guide?.title,
+    ...(guide ? guide.steps.flatMap((s) => [s.title, s.text, ...(s.details?.steps || [])]) : [benefit.howTo, benefit.basis]),
+  ];
+  const pageTerms = termsIn(pageTexts, data.glossary);
 
   return (
     <>
@@ -74,6 +82,11 @@ export default function GuideScreen({ data, route }) {
           </ul>
         </section>
       )}
+
+      <section aria-labelledby="terms-h" className="terms-section" hidden={!pageTerms.length}>
+        <h2 id="terms-h" className="section-title">{t('guide.terms')}</h2>
+        <Terms texts={pageTexts} glossary={data.glossary} />
+      </section>
 
       <p className="notice" role="note">{t('common.draftNotice')}</p>
       <a className="btn btn-primary" href={href('help', '', { topic: benefit.id })}>{t('guide.helpButton')}</a>

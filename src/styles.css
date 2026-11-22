@@ -185,3 +185,12 @@ input[aria-invalid='true'] { border-color: var(--error); border-width: 3px; }
   font-size: 1.0625rem; color: var(--text);
 }
 .substeps li::marker { font-weight: 700; color: var(--accent-dark); }
+
+/* Abbreviation meanings: «ГСП — государственное социальное пособие». */
+.terms { display: flex; flex-direction: column; gap: 4px; margin: 0; font-size: 1rem; color: var(--muted); }
+.terms > div { display: block; }
+.terms dt, .terms dd { display: inline; }
+.terms dt { font-weight: 700; color: var(--text); }
+.terms dt::after { content: ' — '; font-weight: 400; color: var(--muted); }
+.terms dd { margin: 0; }
+.terms-section .terms { font-size: 1.0625rem; gap: 8px; }
