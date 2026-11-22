@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { loadAll, loadDict } from './lib/data.js';
 import { I18nContext, makeT } from './lib/i18n.jsx';
 import { useRoute, navigate } from './lib/router.js';
-import { loadState, saveState, clearState } from './lib/storage.js';
+import { clearState } from './lib/storage.js';
 import YearScreen from './screens/YearScreen.jsx';
 import GroupScreen from './screens/GroupScreen.jsx';
 import BenefitsScreen from './screens/BenefitsScreen.jsx';
@@ -20,9 +20,10 @@ export default function App() {
   const [failed, setFailed] = useState(false);
   const [dicts, setDicts] = useState({ ru: null });
   const [lang, setLang] = useState(storedLang() || 'ru');
+  // Answers live in memory only: refreshing the page starts over.
   // profile: { segment, options, group, childhood } — no birth year, no names.
-  const [profile, setProfile] = useState(() => loadState().profile || null);
-  const [received, setReceived] = useState(() => loadState().received || {});
+  const [profile, setProfile] = useState(null);
+  const [received, setReceived] = useState({});
 
   useEffect(() => {
     loadAll().then(setData).catch(() => setFailed(true));
@@ -39,7 +40,8 @@ export default function App() {
     document.documentElement.lang = activeLang;
   }, [activeLang, dicts]);
 
-  useEffect(() => { saveState({ profile, received }); }, [profile, received]);
+  // Remove answers saved on this device by earlier versions of the site.
+  useEffect(() => { clearState(); }, []);
 
   const t = useMemo(() => makeT(dicts[activeLang], dicts.ru), [dicts, activeLang]);
   const i18n = useMemo(() => ({ t, lang: activeLang }), [t, activeLang]);
@@ -62,7 +64,6 @@ export default function App() {
   }
 
   function reset() {
-    clearState();
     setProfile(null);
     setReceived({});
     navigate('year');

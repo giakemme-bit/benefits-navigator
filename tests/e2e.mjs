@@ -58,19 +58,20 @@ assert.ok(await page.getByLabel('Что не получается?').isVisible()
 assert.ok(await page.getByText('Контакты оператора скоро появятся.').isVisible());
 await noHScroll('5-help');
 
-// Mark as received → "Как получить" disappears, survives reload (localStorage).
+// Mark as received → "Как получить" disappears; refresh starts over; nothing is stored.
 await page.goto(URL + '#/benefits');
-await page.locator('li', { hasText: 'Санаторно-курортное лечение' }).getByRole('checkbox').check();
-await page.reload();
 await page.getByRole('heading', { name: 'Вам положено' }).waitFor();
-assert.ok(await page.locator('li', { hasText: 'Санаторно-курортное лечение' }).getByRole('checkbox').isChecked());
+await page.locator('li', { hasText: 'Санаторно-курортное лечение' }).getByRole('checkbox').check();
 assert.equal(await page.getByRole('link', { name: /Как получить: Санаторно/ }).count(), 0);
-
-await page.getByRole('button', { name: /Начать заново/ }).tap();
+assert.equal(await page.evaluate(() => Object.keys(localStorage).filter((k) => k.startsWith('benefits-navigator:v')).length), 0, 'nothing stored');
+await page.reload();
 await page.getByRole('heading', { name: 'Узнайте, какая помощь вам положена' }).waitFor();
-const saved = JSON.parse(await page.evaluate(() => localStorage.getItem('benefits-navigator:v1')) || '{}');
-assert.ok(!saved.profile && !Object.keys(saved.received || {}).length, 'reset clears storage');
-assert.ok(!JSON.stringify(saved).includes('1985'), 'birth year never stored');
+
+// Old saved answers from earlier versions are removed on load.
+await page.evaluate(() => localStorage.setItem('benefits-navigator:v1', '{"received":{"x":true}}'));
+await page.reload();
+await page.getByRole('heading', { level: 1 }).waitFor();
+assert.equal(await page.evaluate(() => localStorage.getItem('benefits-navigator:v1')), null);
 
 // Path 2: child under 7 → no group question at all.
 const y = new Date().getFullYear() - 3;
