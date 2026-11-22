@@ -8,7 +8,6 @@
   "common.reload": "Обновить страницу",
   "common.language": "Язык",
   "common.draftNotice": "Суммы и порядок сверяются с официальными источниками. Информация может отличаться.",
-
   "year.title": "Узнайте, какая помощь вам положена",
   "year.lead": "Ответьте на 2 вопроса. Мы покажем льготы и объясним, как их получить.",
   "year.label": "Год рождения человека с инвалидностью",
@@ -19,7 +18,6 @@
   "year.errorFormat": "Год должен состоять из 4 цифр, например 1990.",
   "year.errorRange": "Проверьте год. Введите год от {min} до {max}.",
   "year.helpLink": "Нужна помощь? Написать оператору",
-
   "group.step": "Вопрос 2 из 2",
   "group.title": "Какая группа инвалидности?",
   "group.I": "I группа",
@@ -32,12 +30,10 @@
   "group.no": "Нет",
   "group.submit": "Показать мои льготы",
   "group.errorGroup": "Выберите группу инвалидности.",
-
   "segment.child": "ребёнок",
   "segment.adult": "взрослый",
   "segment.pensioner": "пенсионер",
   "segment.childhood": "с детства",
-
   "benefits.title": "Вам положено",
   "benefits.lead": "Отметьте то, что уже получаете.",
   "benefits.received": "Получаю",
@@ -47,7 +43,6 @@
   "benefits.counter": "Получаете {done} из {total}",
   "benefits.change": "Изменить ответы",
   "benefits.reset": "Начать заново и стереть ответы",
-
   "guide.stepsLabel": "Шаги",
   "guide.genericTitle": "Как получить: {title}",
   "guide.where": "Куда обращаться",
@@ -56,7 +51,6 @@
   "guide.externalHint": "(откроется в новой вкладке)",
   "guide.notFound": "Инструкция не найдена.",
   "guide.helpButton": "Не получается? Нужна помощь",
-
   "help.title": "Мы поможем",
   "help.lead": "Опишите, на каком шаге вы застряли. Оператор ответит в WhatsApp или Telegram.",
   "help.label": "Что не получается?",
@@ -70,10 +64,10 @@
   "help.messageIntro": "Здравствуйте! Мне нужна помощь с навигатором по льготам.",
   "help.messageTopic": "Тема: {topic}.",
   "help.messageProfile": "Группа: {group}, {segment}.",
-
   "titles.year": "Год рождения",
   "titles.group": "Группа инвалидности",
   "titles.benefits": "Что вам положено",
   "titles.guide": "Инструкция",
-  "titles.help": "Нужна помощь"
+  "titles.help": "Нужна помощь",
+  "guide.more": "Подробно"
 }

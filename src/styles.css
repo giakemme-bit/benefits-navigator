@@ -165,3 +165,23 @@ input[aria-invalid='true'] { border-color: var(--error); border-width: 3px; }
 
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
 @media (forced-colors: active) { .choice:has(input:checked), .card-done { border-style: double; } }
+
+/* Expandable sub-steps inside a guide step (native <details>: keyboard and screen readers work out of the box). */
+.more { margin-top: 6px; }
+.more summary {
+  display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 8px 14px;
+  border: 2px solid var(--accent); border-radius: 12px; cursor: pointer;
+  font-size: 1.125rem; font-weight: 700; color: var(--accent-dark); list-style: none;
+}
+.more summary::-webkit-details-marker { display: none; }
+.more summary::before {
+  content: ''; flex: none; width: 10px; height: 10px; margin: 0 4px 0 2px;
+  border-right: 3px solid currentColor; border-bottom: 3px solid currentColor; transform: rotate(-45deg);
+}
+.more[open] summary::before { transform: rotate(45deg); }
+.more[open] summary { background: var(--accent-bg); }
+.substeps {
+  list-style: decimal; padding: 14px 0 4px 28px; display: flex; flex-direction: column; gap: 10px;
+  font-size: 1.0625rem; color: var(--text);
+}
+.substeps li::marker { font-weight: 700; color: var(--accent-dark); }

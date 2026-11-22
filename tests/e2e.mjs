@@ -40,12 +40,16 @@ assert.ok(await page.getByText('Суммы и порядок сверяются 
 await tap(page.getByRole('link', { name: /Как получить: Санаторно-курортное лечение/ }));
 await page.getByRole('heading', { name: 'Как получить санаторно-курортное лечение' }).waitFor();
 assert.equal(await page.locator('.step-card').count(), 4);
-await noHScroll('4-guide');
-console.log(`screen 1 → 4 in ${taps} taps`);
-assert.ok(taps <= 5);
-
 // Focus moved to the new screen's heading.
 assert.equal(await page.evaluate(() => document.activeElement.tagName), 'H1');
+const more = page.getByText('Подробно: как подать на eGov.kz');
+assert.ok(!(await page.getByText('Откройте сайт eGov.kz.').isVisible()));
+await more.tap();
+assert.ok(await page.getByText('Откройте сайт eGov.kz.').isVisible());
+await noHScroll('4-guide');
+await more.tap();
+console.log(`screen 1 → 4 in ${taps} taps`);
+assert.ok(taps <= 5);
 
 // Help screen
 await page.getByRole('link', { name: 'Не получается? Нужна помощь' }).tap();

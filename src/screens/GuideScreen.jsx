@@ -41,6 +41,14 @@ export default function GuideScreen({ data, route }) {
               <div>
                 <h2 className="card-title">{s.title}</h2>
                 <p className="card-text">{s.text}</p>
+                {s.details?.steps?.length > 0 && (
+                  <details className="more">
+                    <summary>{s.details.title || t('guide.more')}</summary>
+                    <ol className="substeps">
+                      {s.details.steps.map((line, j) => <li key={j}>{line}</li>)}
+                    </ol>
+                  </details>
+                )}
               </div>
             </li>
           ))}
